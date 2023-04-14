@@ -11,15 +11,15 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_DB=bitpapa_bot
 JWT_SECRET_KEY=secret_key
 JWT_REFRESH_SECRET_KEY=refresh_secret_key
+API_URL=http://localhost:8011/api/v1
 ```
 
-Change `JWT_SECRET_KEY` and `JWT_REFRESH_SECRET_KEY` to whatever value you like.
+Change `JWT_SECRET_KEY` and `JWT_REFRESH_SECRET_KEY` to whatever value you like. Change API_URL to your server URL.
 
 Build docker containers:
 ```
-docker compose build --build-arg API_URL=<your url>
+docker compose build
 ```
-<your url> - URL of your server, or `http://localhost:8011/api/v1` for local use.
 
 Start docker containers:
 ```

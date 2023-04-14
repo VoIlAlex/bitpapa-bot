@@ -25,6 +25,8 @@ services:
     build:
       context: ./config_front
       dockerfile: ../provision/Dockerfile.front
+      args:
+        REACT_APP_API_URL: ${API_URL}
     env_file:
       - ./.env
     command: [

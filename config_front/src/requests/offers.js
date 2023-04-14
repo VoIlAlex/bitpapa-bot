@@ -37,3 +37,13 @@ export const requestCreateOffer = (token, data) => {
         }
     })
 }
+
+export const requestDeleteOffer = (token, offerId) => {
+    return fetch(`${OFFERS_URL}${offerId}/`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
+        }
+    })
+}

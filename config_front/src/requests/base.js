@@ -5,6 +5,9 @@ export const compileRequest = (requestObjBuilder, outputHandler, errorHandler, a
     let skip = false;
     requestObjBuilder().then(res => {
         if (res.ok) {
+            if (res.status === 204) {
+                return new Promise((resolve, reject) => resolve(null));
+            }
             return res.json()
         } else {
             if (res.status === 401 && autoRefresh) {

@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {compileRequest} from "../../../requests/base";
 import {requestToken} from "../../../requests/auth";
+import Header from "../../sections/Header";
 
 
 export default () => {
@@ -22,6 +23,7 @@ export default () => {
 
     return (
         <div>
+            <Header />
             <form onSubmit={login}>
                 <input value={username} onChange={e => setUsername(e.target.value)} />
                 <input value={password} onChange={e => setPassword(e.target.value)} />

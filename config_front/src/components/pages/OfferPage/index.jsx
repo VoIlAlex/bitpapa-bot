@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {requestCreateOffer, requestOfferById, requestUpdateOffer} from "../../../requests/offers";
 import {useParams} from "react-router-dom";
 import {compileRequest} from "../../../requests/base";
+import Header from "../../sections/Header";
 
 export default () => {
     const [offer, setOffer] = useState(null);
@@ -39,7 +40,7 @@ export default () => {
                     return requestCreateOffer(accessToken, offer)
                 },
                 data => {
-                    window.location.href = "/offers/" + data.id
+                    window.location.href = "/"
                 }
             )
         } else {
@@ -57,6 +58,7 @@ export default () => {
 
     return (
         <div>
+            <Header />
             {offer ? (
                 <form onSubmit={onFormSave}>
                     <input

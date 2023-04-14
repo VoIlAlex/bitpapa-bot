@@ -4,8 +4,8 @@ services:
   bitpapa_bot:
     container_name: bitpapa_bot
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./app
+      dockerfile: ../provision/Dockerfile.server
     env_file:
       - ./.env
     ports:
@@ -20,6 +20,19 @@ services:
       "--port", "8003",
       "--reload",
       "main:app"
+    ]
+
+  config_front:
+    container_name: config_front
+    build:
+      context: ./config_front
+      dockerfile: ../provision/Dockerfile.front
+    env_file:
+      - ./.env
+    ports:
+      - "8088:80"
+    command: [
+      "nginx", "-g", "daemon off;"
     ]
 
   postgres:

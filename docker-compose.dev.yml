@@ -1,13 +1,15 @@
 version: '3.8'
 
 services:
-  config_server:
+  bitpapa_bot:
     container_name: bitpapa_bot
     build:
       context: ./app
       dockerfile: ../provision/Dockerfile.server
     env_file:
       - ./.env
+    ports:
+      - "8011:8003"
     depends_on:
       - postgres
     volumes:
@@ -21,24 +23,17 @@ services:
     ]
 
   config_front:
-    container_name: bitpapa_config_front
+    container_name: config_front
     build:
       context: ./config_front
       dockerfile: ../provision/Dockerfile.front
     env_file:
       - ./.env
+    ports:
+      - "8088:80"
     command: [
       "nginx", "-g", "daemon off;"
     ]
-
-  nginx:
-    image: nginx:latest
-    container_name: bitpapa_nginx
-    restart: unless-stopped
-    ports:
-      - "8555:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
 
   postgres:
     image: postgres:14-alpine3.17
@@ -47,6 +42,8 @@ services:
       - ./.env
     volumes:
       - data-postgres:/var/lib/postgresql/data
+    ports:
+      - "25438:5432"
 
 volumes:
   data-postgres:

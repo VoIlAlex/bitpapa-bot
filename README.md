@@ -15,7 +15,13 @@ JWT_REFRESH_SECRET_KEY=refresh_secret_key
 
 Change `JWT_SECRET_KEY` and `JWT_REFRESH_SECRET_KEY` to whatever value you like.
 
-Build and start docker containers:
+Build docker containers:
+```
+docker compose build --build-arg API_URL=<your url>
+```
+<your url> - URL of your server, or `http://localhost:8011` for local use.
+
+Start docker containers:
 ```
 docker compose up -d
 ```

@@ -54,7 +54,7 @@ class JWTService:
     def get_token_payload(jwt_token: str, secret: str = config.JWT_SECRET_KEY) -> TokenPayload:
         try:
             payload = jwt.decode(
-                jwt_token, secret, algorithms=[config.JWT_ALGORITHM]
+                jwt_token, secret, algorithms=[config.JWT_ALGORITHM], verify=False
             )
             token_payload = TokenPayload(**payload)
         except(jwt.exceptions.PyJWTError, ValidationError):
@@ -93,8 +93,11 @@ class JWTService:
     @staticmethod
     def check_for_refresh(access_token: str, refresh_token: str) -> int:
         try:
+            print(access_token)
+            print(refresh_token)
+            print(config.JWT_SECRET_KEY)
             access_token_payload = JWTService.get_token_payload(access_token)
-
+            print(access_token_payload)
             refresh_token_payload = JWTService.get_token_payload(
                 refresh_token,
                 secret=config.JWT_REFRESH_SECRET_KEY

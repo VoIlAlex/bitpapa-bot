@@ -30,7 +30,7 @@ export default ({className}) => {
                     window.location.reload();
                 },
                 err => {
-                    alert("An error occurred while trying to delete an offer.")
+                    alert(`An error occurred while trying to delete an offer: ${err}`)
                 }
             )
         }

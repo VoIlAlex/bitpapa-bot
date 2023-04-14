@@ -18,7 +18,10 @@ export default ({className}) => {
                 localStorage.setItem("refresh_token", data.refresh_token);
                 window.location.href = "/";
             },
-            err => setPassword("")
+            err => {
+                alert("Wrong username or password.");
+                setPassword("");
+            }
         )
     }
 

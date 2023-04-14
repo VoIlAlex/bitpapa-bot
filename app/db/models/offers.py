@@ -54,3 +54,9 @@ class Offer(Base):
             session.add(self)
             await session.commit()
             await session.refresh(self)
+
+    async def delete(self):
+        async with AsyncSession() as session:
+            session.add(self)
+            await session.delete(self)
+            await session.commit()

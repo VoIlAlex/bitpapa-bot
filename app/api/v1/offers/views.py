@@ -50,3 +50,16 @@ async def update_offer_view(
 
     await offer.update(**data.dict())
     return offer
+
+
+async def delete_offer_view(
+    offer_id: int,
+    _=Depends(JWTService.get_current_user)
+):
+    offer = await Offer.get_by_id(offer_id)
+    if not offer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Offer not found"
+        )
+    await offer.delete()

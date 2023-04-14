@@ -11,7 +11,7 @@ router.add_api_route(
     tags=["Offers"]
 )
 router.add_api_route(
-    "/{offer_id}",
+    "/{offer_id}/",
     endpoint=views.get_offer_by_id_view,
     methods=["GET"],
     status_code=status.HTTP_200_OK,
@@ -19,11 +19,19 @@ router.add_api_route(
     tags=["Offers"]
 )
 router.add_api_route(
-    "/{offer_id}",
+    "/{offer_id}/",
     endpoint=views.update_offer_view,
     methods=["PUT"],
     status_code=status.HTTP_200_OK,
     description="Update offer view.",
+    tags=["Offers"]
+)
+router.add_api_route(
+    "/{offer_id}/",
+    endpoint=views.delete_offer_view,
+    methods=["DELETE"],
+    status_code=status.HTTP_204_NO_CONTENT,
+    description="Delete offer view.",
     tags=["Offers"]
 )
 router.add_api_route(

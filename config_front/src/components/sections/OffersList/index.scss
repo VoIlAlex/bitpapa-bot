@@ -1,0 +1,82 @@
+.offers-list {
+  width: 100%;
+  max-width: 400px;
+  background-color: #f5f7fa;;
+  border-radius: 4px;
+  padding: 20px;
+
+
+  .offers-list__title {
+    font-size: 24px;
+    margin: 16px 0;
+  }
+  .offers-list__list {
+    color: #474759;
+    border-bottom: 1px solid #c7d1da;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+
+    .offers-list__list-item {
+      display: flex;
+      position: relative;
+      width: 100%;
+      margin-bottom: 16px;
+
+      .offers-list__list-item-link {
+        margin: 0;
+        text-decoration: none;
+        color: #474759;
+
+        .offers-list__list-item-container {
+          border: 1px solid #c7d1da;
+          border-radius: 4px;
+          padding: 10px 15px;
+          width: 280px;
+
+          &:hover {
+            border: 1px solid #92989f;
+          }
+
+          .offers-list__list-item-text {
+            margin: 0;
+          }
+        }
+      }
+      .offers-list__list-item-delete {
+        position: absolute;
+        right: 0;
+        height: 38px;
+        padding-left: 16px;
+        padding-right: 16px;
+        border: none;
+        border-radius: 19px;
+        background-color: #547dfe;
+        color: rgb(245, 255, 250);
+        font-weight: 600;
+        transition-duration: 200ms;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #f84822;
+        }
+      }
+    }
+  }
+  .offers-list__create-button {
+    text-decoration: none;
+    color: rgb(245, 255, 250);
+    background-color: #547dfe;
+    display: block;
+    width: 100%;
+    padding: 16px 0px;
+    text-align: center;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition-duration: 200ms;
+
+    &:hover {
+      background-color: #243ca4;
+    }
+  }
+}

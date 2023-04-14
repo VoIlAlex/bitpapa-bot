@@ -7,9 +7,11 @@ export default () => {
     const [offers, setOffers] = useState(null);
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("access_token");
         compileRequest(
-            requestOffers(accessToken),
+            () => {
+                const accessToken = localStorage.getItem("access_token");
+                return requestOffers(accessToken)
+            },
             data => setOffers(data)
         )
     }, [])

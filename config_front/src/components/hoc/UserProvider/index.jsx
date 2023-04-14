@@ -10,11 +10,14 @@ export default ({children}) => {
     const [currentUser, setCurrentUser] = useRecoilState(userAtom);
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("access_token");
         if (window.location.pathname !== "/login") {
+            const accessToken = localStorage.getItem("access_token");
             if (accessToken) {
                 compileRequest(
-                    requestMe(accessToken),
+                    () => {
+                        const accessToken = localStorage.getItem("access_token");
+                        return requestMe(accessToken)
+                    },
                     data => setCurrentUser(data)
                 )
             } else {

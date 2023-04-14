@@ -10,7 +10,7 @@ export default () => {
     const login = (e) => {
         e.preventDefault();
         compileRequest(
-            requestToken(username, password),
+            () => requestToken(username, password),
             data => {
                 localStorage.setItem("access_token", data.access_token);
                 localStorage.setItem("refresh_token", data.refresh_token);

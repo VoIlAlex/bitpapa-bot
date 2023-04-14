@@ -19,7 +19,7 @@ Build docker containers:
 ```
 docker compose build --build-arg API_URL=<your url>
 ```
-<your url> - URL of your server, or `http://localhost:8011` for local use.
+<your url> - URL of your server, or `http://localhost:8011/api/v1` for local use.
 
 Start docker containers:
 ```

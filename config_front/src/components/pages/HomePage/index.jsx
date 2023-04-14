@@ -17,14 +17,18 @@ export default () => {
     }, [])
 
     return (
-        <div>
-            {offers ? (
-                offers.map(offer => (
-                    <div>
-                        <p>{offer.id}</p>
-                    </div>
-                ))
-            ) : null}
+        <div className="home-page">
+            <div className="home-page__offers-list">
+                {offers ? (
+                    offers.map(offer => (
+                        <a href={"/offers/" + offer.id}>
+                            <div>
+                                <p>{offer.number}</p>
+                            </div>
+                        </a>
+                    ))
+                ) : null}
+            </div>
         </div>
     )
 }

@@ -28,12 +28,12 @@ docker compose up -d
 
 Run migrations on database:
 ```
-docker compose exec bitpapa_bot alembic upgrade head
+docker compose exec config_server alembic upgrade head
 ```
 
 Create an user:
 ```
-docker compose exec bitpapa_bot ./xcli.py create_user <username> <password>
+docker compose exec config_server ./xcli.py create_user <username> <password>
 ```
 
 Values:

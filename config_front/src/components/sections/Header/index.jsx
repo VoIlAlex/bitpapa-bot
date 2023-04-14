@@ -1,4 +1,5 @@
 import React from "react";
+import "./index.scss";
 import {useRecoilState} from "recoil";
 import {userAtom} from "../../../recoil/atoms";
 
@@ -12,11 +13,11 @@ export default () => {
     }
 
     return (
-        <div>
+        <div className="header">
             {currentUser ? (
                 <>
-                    <a href="/">Home</a>
-                    <button onClick={logout}>Logout</button>
+                    <a className="header__home" href="/">bitpapa bot</a>
+                    <button className="header__logout" onClick={logout}>Logout</button>
                 </>
             ) : null}
         </div>

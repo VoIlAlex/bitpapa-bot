@@ -1,0 +1,23 @@
+.user-hoc {
+  .user-hoc__spinner-container {
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    width: 180px;
+    height: 180px;
+
+    .user-hoc__spinner-text {
+      color: rgb(245, 255, 250);
+      font-size: 24px;
+    }
+    .user-hoc__spinner-wrapper {
+      width: fit-content;
+      margin-left: 67.5px;
+    }
+  }
+}

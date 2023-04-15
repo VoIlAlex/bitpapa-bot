@@ -37,6 +37,9 @@ services:
     image: nginx:latest
     container_name: bitpapa_nginx
     restart: unless-stopped
+    depends_on:
+      - config_server
+      - config_front
     ports:
       - "8555:80"
     volumes:

@@ -10,7 +10,7 @@ export const compileRequest = (requestObjBuilder, outputHandler, errorHandler, a
             }
             return res.json()
         } else {
-            if (res.status === 401 && autoRefresh) {
+            if ((res.status === 401 || res.status === 403) && autoRefresh) {
                 const access_token = localStorage.getItem("access_token");
                 const refresh_token = localStorage.getItem("refresh_token");
                 if (access_token && refresh_token) {

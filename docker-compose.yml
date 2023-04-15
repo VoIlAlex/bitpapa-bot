@@ -13,13 +13,6 @@ services:
     volumes:
       - ./app:/app
     entrypoint: ./config_server.entrypoint.sh
-#     command: [
-#       "uvicorn",
-#       "--host", "0.0.0.0",
-#       "--port", "8003",
-#       "--reload",
-#       "main:app"
-#     ]
 
   config_front:
     container_name: bitpapa_config_front

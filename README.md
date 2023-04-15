@@ -45,7 +45,7 @@ docker compose exec config_server ./xcli.py change_password <username> <new_pass
 
 ## Security 
 
-To reset all the accesses go to `.env` and change values of `JWT_SECRET_KEY` and `JWT_REFRESH_SECRET_KEY`. Then run:
+To reset all the accesses to the front go to `.env` and change values of `JWT_SECRET_KEY` and `JWT_REFRESH_SECRET_KEY`. Then run:
 ```
 docker compose up -d --build
 ```

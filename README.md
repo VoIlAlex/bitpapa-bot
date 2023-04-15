@@ -36,6 +36,12 @@ Create an user:
 docker compose exec config_server ./xcli.py create_user <username> <password>
 ```
 
+Change the user password:
+```
+docker compose exec config_server ./xcli.py change_password <username> <new_password>
+```
+
 Values:
 - \<username> - username you would like to use.
 - \<password> - password you would like to use.
+- \<new_password> - password to change to.

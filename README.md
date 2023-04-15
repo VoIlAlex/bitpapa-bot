@@ -69,5 +69,5 @@ Every user after that should be logged out.
 - Dockerfiles - *./provision/*.
 - docker-compose.yml for deployment - *./docker-compose.yml*.
 - docker-compose.yml for local development - *./docker-compose.dev.yml*.
-
+- Entrypoints to start server services - *./app/entrypoints/*.
 

@@ -51,10 +51,10 @@ class JWTService:
         return encoded_jwt.decode("UTF-8")
 
     @staticmethod
-    def get_token_payload(jwt_token: str, secret: str = config.JWT_SECRET_KEY) -> TokenPayload:
+    def get_token_payload(jwt_token: str, secret: str = config.JWT_SECRET_KEY, verify: bool = True) -> TokenPayload:
         try:
             payload = jwt.decode(
-                jwt_token, secret, algorithms=[config.JWT_ALGORITHM], verify=False
+                jwt_token, secret, algorithms=[config.JWT_ALGORITHM], verify=verify
             )
             token_payload = TokenPayload(**payload)
         except(jwt.exceptions.PyJWTError, ValidationError):
@@ -96,7 +96,7 @@ class JWTService:
             print(access_token)
             print(refresh_token)
             print(config.JWT_SECRET_KEY)
-            access_token_payload = JWTService.get_token_payload(access_token)
+            access_token_payload = JWTService.get_token_payload(access_token, verify=False)
             print(access_token_payload)
             refresh_token_payload = JWTService.get_token_payload(
                 refresh_token,

@@ -31,6 +31,8 @@ Run migrations on database:
 docker compose exec config_server alembic upgrade head
 ```
 
+## Managing user
+
 Create an user:
 ```
 docker compose exec config_server ./xcli.py create_user <username> <password>
@@ -40,6 +42,16 @@ Change the user password:
 ```
 docker compose exec config_server ./xcli.py change_password <username> <new_password>
 ```
+
+## Security 
+
+To reset all the accesses go to `.env` and change values of `JWT_SECRET_KEY` and `JWT_REFRESH_SECRET_KEY`. Then run:
+```
+docker compose up -d --build
+```
+
+Every user after that should be logged out.
+
 
 Values:
 - \<username> - username you would like to use.

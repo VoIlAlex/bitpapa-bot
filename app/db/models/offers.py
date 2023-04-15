@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from sqlalchemy import Column, Integer, String, DateTime, select, DECIMAL, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, select, DECIMAL, Boolean, Text
 from sqlalchemy.sql import func
 from db.base import Base, AsyncSession
 
@@ -21,6 +21,15 @@ class Offer(Base):
     search_price_limit_max = Column(DECIMAL(12, 2), nullable=False)
     search_minutes_offline_max = Column(Integer(), nullable=False)
 
+    is_initialized = Column(Boolean(), default=False)
+    init_error = Column(Text(), nullable=True, default=None)
+    is_active = Column(Boolean(), default=True)
+    currency_code = Column(String(255))
+    crypto_currency_code = Column(String(255))
+
+    current_price = Column(DECIMAL(12, 2), nullable=True)
+    current_min_price = Column(DECIMAL(12, 2), nullable=True)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -35,6 +44,16 @@ class Offer(Base):
     async def get_all() -> List["Offer"]:
         async with AsyncSession() as session:
             query = select(Offer)
+            result = await session.execute(query)
+            return [x[0] for x in result.fetchall()]
+
+    @staticmethod
+    async def get_all_active() -> List["Offer"]:
+        async with AsyncSession() as session:
+            query = select(Offer).where(
+                Offer.is_initialized is True,
+                Offer.is_active is True,
+            )
             result = await session.execute(query)
             return [x[0] for x in result.fetchall()]
 

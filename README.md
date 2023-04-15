@@ -64,6 +64,8 @@ Every user after that should be logged out.
 ## Repository content
 - Config server (FastAPI) - *./app/*.
 - Config front (React) - *./config_front/*.
+- Min price updater (HTTPX) - *./app/tasks/update_price_info.py*.
+- Offer price updater (HTTPX) - *./app/tasks/update_offer.py*. 
 - Dockerfiles - *./provision/*.
 - docker-compose.yml for deployment - *./docker-compose.yml*.
 - docker-compose.yml for local development - *./docker-compose.dev.yml*.

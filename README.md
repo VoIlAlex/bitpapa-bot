@@ -1,5 +1,9 @@
 # Bitpapa BOT
 
+## Requirements
+- Docker
+- Docker Compose 
+
 ## Installation 
 
 Create `.env` file. Fill it with values by example:

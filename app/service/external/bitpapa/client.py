@@ -1,3 +1,5 @@
+import json
+import logging
 from decimal import Decimal
 from typing import Union
 
@@ -5,6 +7,8 @@ import httpx
 
 from service.external.bitpapa.schema import SearchOffersResult
 
+
+logger = logging.getLogger(__name__)
 
 class BitPapaClient:
     def __init__(self,
@@ -19,7 +23,7 @@ class BitPapaClient:
         type_: str = None,
         amount: float = None,
         currency_code: str = None,
-        limit: int = 100,
+        limit: int = 10,
         page: int = 0,
         sort: str = "price"
     ):
@@ -44,18 +48,18 @@ class BitPapaClient:
                 url,
                 params=params,
                 headers={
-                    "content-Type": "application/json",
+                    "Content-Type": "application/json",
                     "X-Access-Token": self.token
                 }
             )
             if res.status_code != 200:
                 try:
-                    err_info = await res.json()
+                    err_info = res.json()
                 except Exception:
                     err_info = {}
                 raise RuntimeError("Request error.", res.status_code, err_info)
 
-            data = await res.json()
+            data = res.json()
             return SearchOffersResult(**data)
 
     async def update_offer(
@@ -63,6 +67,24 @@ class BitPapaClient:
         offer_id: str,
         price: Union[Decimal, float]
     ):
-        ...
+        url = f"{self.api_url}/pro/{offer_id}"
+        body = {
+            "price": price
+        }
+        async with httpx.AsyncClient() as client:
+            res = await client.put(
+                url,
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Access-Token": self.token
+                },
+                json=body
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
 
 

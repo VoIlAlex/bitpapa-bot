@@ -1,12 +1,12 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 
 class SearchOfferUser(BaseModel):
-    id: int
+    id: str
     user_name: str
     online: bool
     last_sign_in_at: datetime
@@ -14,12 +14,11 @@ class SearchOfferUser(BaseModel):
     # TODO: should be handle those parameters
     is_guest: bool
     is_suspicious: bool
-    is_verified: bool
+    # is_verified: bool
 
 
 class SearchOffer(BaseModel):
     id: str
-    human_id: str
     crypto_currency_code: str
     type: str
     currency_code: str
@@ -29,8 +28,9 @@ class SearchOffer(BaseModel):
     limit_min: float
     limit_max: float
     is_active: bool
-    price: Decimal()
+    price: float
     user: SearchOfferUser
+    human_id: Optional[str] = None
 
 
 class SearchOffersResult(BaseModel):

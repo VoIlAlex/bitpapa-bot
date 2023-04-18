@@ -1,6 +1,9 @@
 import asyncio
-from datetime import datetime
+import json
+import redis.asyncio as redis
+from datetime import datetime, timezone
 from decimal import Decimal
+from logging import getLogger
 from typing import Union
 
 from config import config
@@ -8,6 +11,9 @@ from db.models import Offer
 from service.external.bitpapa.client import BitPapaClient
 from service.external.bitpapa.schema import SearchOffer
 from tasks.base import Task
+
+
+logger = getLogger(__name__)
 
 
 class TaskUpdatePriceInfo(Task):
@@ -18,15 +24,32 @@ class TaskUpdatePriceInfo(Task):
         price_limit_min: Union[Decimal, float],
         minutes_offline_max: int
     ):
-        if price_limit_min > offer_data.price < price_limit_max:
+        if offer_data.price < price_limit_min:
+            logger.info(f"Min: {price_limit_min} Current: {offer_data.price}")
+            return False
+        if offer_data.price > price_limit_max:
+            logger.info(f"Max: {price_limit_max} Current: {offer_data.price}")
             return False
         if not offer_data.user.online:
             minutes_offline = (
-                datetime.utcnow() - offer_data.user.last_sign_in_at
+                datetime.now(timezone.utc) - offer_data.user.last_sign_in_at
             ).seconds / 60.0
             if minutes_offline > minutes_offline_max:
+                logger.info(f"Max minutes offline: {minutes_offline_max} Minutes offline: {minutes_offline}")
                 return False
         return True
+
+    @staticmethod
+    async def send_websocket_message(offer_id: int, price: str):
+        r = redis.from_url(config.REDIS_URL)
+        channel_name = f"offer-channel:{offer_id}"
+        await r.publish(channel_name, json.dumps({
+            "type": "update-min-price",
+            "data": {
+                "offer_id": offer_id,
+                "price": price
+            }
+        }))
 
     @staticmethod
     async def update_price_info_for_offer(offer: Offer):
@@ -37,12 +60,15 @@ class TaskUpdatePriceInfo(Task):
         page = 0
 
         while pages == -1 or page <= pages:
+            now = datetime.now()
             results = await client.search(
                 crypto_currency_code=offer.crypto_currency_code,
                 type_="Ad::Sell",
                 currency_code=offer.currency_code,
                 page=page
             )
+            spent_time = datetime.now() - now
+            logger.info(f"Request complete in {spent_time.seconds}.{spent_time.microseconds} seconds.")
             pages = results.pages
             page += 1
 
@@ -54,13 +80,17 @@ class TaskUpdatePriceInfo(Task):
                     minutes_offline_max=offer.search_minutes_offline_max
                 )
                 if ad_match:
-                    await offer.update(
-                        current_min_price=ad.price
-                    )
+                    if offer.current_min_price is None or offer.current_min_price != ad.price:
+                        await offer.update(
+                            current_min_price=ad.price
+                        )
+                        await TaskUpdatePriceInfo.send_websocket_message(offer.id, ad.price)
+                        return
 
     @staticmethod
     async def execute():
         offers = await Offer.get_all_active()
+        logger.info(f"Offers to process: {', '.join(str(offer.id) for offer in offers)}")
         tasks = [
             TaskUpdatePriceInfo.update_price_info_for_offer(offer)
             for offer in offers

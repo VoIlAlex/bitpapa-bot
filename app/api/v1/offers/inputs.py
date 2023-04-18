@@ -12,3 +12,5 @@ class OfferInput(BaseModel):
     search_price_limit_min: float
     search_price_limit_max: float
     search_minutes_offline_max: float
+
+    is_active: bool

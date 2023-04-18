@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  bitpapa_bot:
-    container_name: bitpapa_bot
+  config_server:
+    container_name: bitpapa_config_server
     build:
       context: ./app
       dockerfile: ../provision/Dockerfile.server

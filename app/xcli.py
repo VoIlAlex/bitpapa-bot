@@ -54,5 +54,28 @@ def change_password(username: str, password: str):
         print("Aborting.")
 
 
+@cli.group("start")
+def start_group():
+    ...
+
+
+@start_group.command("offer_updater")
+def start_offer_updater():
+    from tasks.update_offer import TaskUpdateOffer
+    TaskUpdateOffer.start_loop()
+
+
+@start_group.command("price_updater")
+def start_price_updater():
+    from tasks.update_price_info import TaskUpdatePriceInfo
+    TaskUpdatePriceInfo.start_loop()
+
+
+@start_group.command("trade_handler")
+def start_trade_handler():
+    from tasks.handle_trade import TaskHandleTrade
+    TaskHandleTrade.start_loop()
+
+
 if __name__ == '__main__':
     cli()

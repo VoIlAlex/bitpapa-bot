@@ -1,16 +1,16 @@
 import asyncio
 from datetime import datetime
 from decimal import Decimal
-from traceback import print_exc
 from typing import Union
 
 from config import config
 from db.models import Offer
 from service.external.bitpapa.client import BitPapaClient
 from service.external.bitpapa.schema import SearchOffer
+from tasks.base import Task
 
 
-class TaskUpdatePriceInfo:
+class TaskUpdatePriceInfo(Task):
     @staticmethod
     def check_offer_params(
         offer_data: SearchOffer,
@@ -59,20 +59,10 @@ class TaskUpdatePriceInfo:
                     )
 
     @staticmethod
-    async def update_price_info():
+    async def execute():
         offers = await Offer.get_all_active()
         tasks = [
             TaskUpdatePriceInfo.update_price_info_for_offer(offer)
             for offer in offers
         ]
         await asyncio.gather(*tasks, return_exceptions=False)
-
-    @staticmethod
-    def start_loop():
-        while True:
-            try:
-                asyncio.get_event_loop().run_until_complete(
-                    TaskUpdatePriceInfo.update_price_info()
-                )
-            except Exception:
-                print_exc()

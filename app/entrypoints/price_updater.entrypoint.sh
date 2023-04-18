@@ -1,2 +1,2 @@
 #!/bin/sh
-python main_price_update.py
+./xcli.py start price_updater

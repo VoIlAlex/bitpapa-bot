@@ -4,6 +4,7 @@ import {useParams} from "react-router-dom";
 import Header from "../../sections/Header";
 import OfferForm from "../../sections/OfferForm";
 import {Helmet} from "react-helmet";
+import Footer from "../../sections/Footer";
 
 export default () => {
     const { offerId } = useParams();
@@ -15,7 +16,10 @@ export default () => {
                 <title>{offerId === "new" ? "New offer" : `Offer #${offerId}`} | Bitpapa BOT</title>
             </Helmet>
             <Header />
-            <OfferForm className="offer-page__form" offerId={offerId}/>
+            <div className="offer-page__form-container">
+                <OfferForm className="offer-page__form" offerId={offerId}/>
+            </div>
+            <Footer />
         </div>
     )
 }

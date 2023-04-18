@@ -3,6 +3,7 @@ import "./index.scss";
 import Header from "../../sections/Header";
 import LoginForm from "../../sections/LoginForm";
 import {Helmet} from "react-helmet";
+import Footer from "../../sections/Footer";
 
 
 export default () => {
@@ -14,6 +15,7 @@ export default () => {
             </Helmet>
             <Header />
             <LoginForm className="login-page__form" />
+            <Footer />
         </div>
     )
 }

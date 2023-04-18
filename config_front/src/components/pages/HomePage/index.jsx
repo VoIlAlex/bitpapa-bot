@@ -3,6 +3,7 @@ import "./index.scss";
 import Header from "../../sections/Header";
 import OffersList from "../../sections/OffersList";
 import {Helmet} from "react-helmet";
+import Footer from "../../sections/Footer";
 
 
 export default () => {
@@ -14,6 +15,7 @@ export default () => {
             </Helmet>
             <Header />
             <OffersList className="home-page__offers-list" />
+            <Footer />
         </div>
     )
 }

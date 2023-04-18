@@ -15,8 +15,10 @@ export default ({offerId, className}) => {
     useEffect(() => {
         if (offerId !== "new" && !websocket) {
             let url = new URL(`${OFFERS_URL}${offerId}/websocket/`);
-            url.protocol = "ws"
+            // TODO: Add secure connection (token)
+            url.protocol = url.protocol === "https" ? "wss" : "ws";
             const ws = new WebSocket(url)
+            setWebsocket(ws);
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.type === "update-min-price") {

@@ -16,7 +16,7 @@ export default ({offerId, className}) => {
         if (offerId !== "new" && !websocket) {
             let url = new URL(`${OFFERS_URL}${offerId}/websocket/`);
             // TODO: Add secure connection (token)
-            url.protocol = url.protocol === "https" ? "wss" : "ws";
+            url.protocol = url.protocol === "https:" ? "wss" : "ws";
             const ws = new WebSocket(url)
             setWebsocket(ws);
             ws.onmessage = (event) => {

@@ -5,9 +5,27 @@ import {useParams} from "react-router-dom";
 import {compileRequest} from "../../../requests/base";
 import Header from "../../sections/Header";
 import classNames from "classnames";
+import {OFFERS_URL} from "../../../config";
 
 export default ({offerId, className}) => {
     const [offer, setOffer] = useState(null);
+    const [currentMinPrice, setCurrentMinPrice] = useState(null);
+    const [websocket, setWebsocket] = useState(null);
+
+    useEffect(() => {
+        if (offerId !== "new" && !websocket) {
+            let url = new URL(`${OFFERS_URL}${offerId}/websocket/`);
+            url.protocol = "ws"
+            const ws = new WebSocket(url)
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === "update-min-price") {
+                    const price = data.data.price.toFixed(2);
+                    setCurrentMinPrice(price);
+                }
+            }
+        }
+    }, [offerId, websocket])
 
     useEffect(() => {
         if (offerId !== "new") {
@@ -16,8 +34,12 @@ export default ({offerId, className}) => {
                     const token = localStorage.getItem("access_token");
                     return requestOfferById(token, offerId);
                 },
-                data => setOffer(data)
+                data => {
+                    setOffer(data)
+                    setCurrentMinPrice(data.current_min_price.toFixed(2))
+                }
             )
+
         } else {
             setOffer({
                 number: "",
@@ -27,7 +49,8 @@ export default ({offerId, className}) => {
                 auto_trade_close: true,
                 search_price_limit_min: "0",
                 search_price_limit_max: "0",
-                search_minutes_offline_max: "0"
+                search_minutes_offline_max: "0",
+                is_active: true
             })
         }
     }, [offerId])
@@ -152,7 +175,26 @@ export default ({offerId, className}) => {
                     })
                 }/>
             </div>
+            <div className="offer-form__checkbox-item">
+                <label className="offer-form__label" itemID="is_active">Is active:</label>
+                <input
+                    className="offer-form__checkbox"
+                    id="is_active"
+                    type={"checkbox"}
+                    checked={offer.is_active}
+                    onChange={e => setOffer({
+                        ...offer,
+                        is_active: e.target.checked
+                    })
+                }/>
+            </div>
             <button className="offer-form__save-button" type={"submit"}>{offerId === "new" ? "Create" : "Update"}</button>
+            {offerId !== "new" ? (
+                <div className="offer-form__after-button">
+                    <p>Current min price: {currentMinPrice} {offer.currency_code} / {offer.crypto_currency_code}</p>
+                    <p>Current price: {offer.current_price}</p>
+                </div>
+            ) : null}
         </form>
     ) : null
 }

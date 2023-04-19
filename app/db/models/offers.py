@@ -27,8 +27,18 @@ class Offer(Base):
     currency_code = Column(String(255))
     crypto_currency_code = Column(String(255))
 
+    # Durations are in microseconds
+
     current_price = Column(DECIMAL(12, 2), nullable=True)
+    current_price_last_updated = Column(DateTime(timezone=True), nullable=True)
+    current_price_last_response_duration = Column(Integer(), nullable=True)
+
     current_min_price = Column(DECIMAL(12, 2), nullable=True)
+    current_min_price_last_updated = Column(DateTime(timezone=True), nullable=True)
+    current_min_price_last_response_duration = Column(Integer(), nullable=True)
+    current_min_price_total_duration = Column(Integer(), nullable=True)
+    current_min_price_requests_number = Column(Integer(), nullable=True)
+    current_min_price_found = Column(Boolean(), default=False, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

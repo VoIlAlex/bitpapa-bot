@@ -19,7 +19,15 @@ class OfferOutput(BaseModel):
     search_minutes_offline_max: float
 
     current_price: Optional[float]
+    current_price_last_updated: Optional[datetime]
+    current_price_last_response_duration: Optional[int]
+
     current_min_price: Optional[float]
+    current_min_price_last_updated: Optional[datetime]
+    current_min_price_last_response_duration: Optional[int]
+    current_min_price_total_duration: Optional[int]
+    current_min_price_requests_number: Optional[int]
+    current_min_price_found: Optional[bool]
 
     is_initialized: bool
     init_error: Optional[str]

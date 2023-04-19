@@ -4,7 +4,7 @@ import redis.asyncio as redis
 from datetime import datetime, timezone
 from decimal import Decimal
 from logging import getLogger
-from typing import Union
+from typing import Union, Optional
 
 from config import config
 from db.models import Offer
@@ -17,6 +17,11 @@ logger = getLogger(__name__)
 
 
 class TaskUpdatePriceInfo(Task):
+    @staticmethod
+    def _elapsed_time_microseconds(start_time: datetime):
+        now = datetime.now()
+        return int((now - start_time).total_seconds() * 1000000)
+
     @staticmethod
     def check_offer_params(
         offer_data: SearchOffer,
@@ -40,14 +45,27 @@ class TaskUpdatePriceInfo(Task):
         return True
 
     @staticmethod
-    async def send_websocket_message(offer_id: int, price: str):
+    async def send_websocket_message(
+        offer_id: int,
+        price: str,
+        found: bool = False,
+        requests_number: int = 1,
+        last_response_duration: int = 0,
+        total_duration: int = 0,
+        last_updated: datetime = None
+    ):
         r = redis.from_url(config.REDIS_URL)
         channel_name = f"offer-channel:{offer_id}"
         await r.publish(channel_name, json.dumps({
             "type": "update-min-price",
             "data": {
                 "offer_id": offer_id,
-                "price": price
+                "price": price,
+                "found": found,
+                "requests_number": requests_number,
+                "last_response_duration": last_response_duration,
+                "total_duration": total_duration,
+                "last_updated": last_updated.isoformat() if last_updated else None
             }
         }))
 
@@ -59,16 +77,20 @@ class TaskUpdatePriceInfo(Task):
         pages = -1
         page = 0
 
+        start_time = datetime.now()
+        response_time: Optional[str, None] = None
+        min_price_to_set: Optional[str, None] = None
+
         while pages == -1 or page <= pages:
-            now = datetime.now()
+            iteration_start_time = datetime.now()
             results = await client.search(
                 crypto_currency_code=offer.crypto_currency_code,
                 type_="Ad::Sell",
                 currency_code=offer.currency_code,
                 page=page
             )
-            spent_time = datetime.now() - now
-            logger.info(f"Request complete in {spent_time.seconds}.{spent_time.microseconds} seconds.")
+            response_time = TaskUpdatePriceInfo._elapsed_time_microseconds(iteration_start_time)
+            logger.info(f"Request complete in {response_time / 1000000} seconds.")
             pages = results.pages
             page += 1
 
@@ -81,11 +103,35 @@ class TaskUpdatePriceInfo(Task):
                 )
                 if ad_match:
                     if offer.current_min_price is None or offer.current_min_price != ad.price:
-                        await offer.update(
-                            current_min_price=ad.price
-                        )
-                        await TaskUpdatePriceInfo.send_websocket_message(offer.id, ad.price)
-                        return
+                        min_price_to_set = ad.price
+                        break
+
+            if min_price_to_set is not None:
+                break
+
+        update_fields = {
+            "current_min_price_last_updated": datetime.now(),
+            "current_min_price_last_response_duration": response_time,
+            "current_min_price_total_duration": TaskUpdatePriceInfo._elapsed_time_microseconds(start_time),
+            "current_min_price_requests_number": page
+        }
+
+        if min_price_to_set is not None:
+            update_fields["current_min_price"] = min_price_to_set
+            update_fields["current_min_price_found"] = True
+        else:
+            update_fields["current_min_price_found"] = False
+
+        await offer.update(**update_fields)
+        await TaskUpdatePriceInfo.send_websocket_message(
+            offer_id=offer.id,
+            price=min_price_to_set,
+            found=update_fields["current_min_price_found"],
+            requests_number=update_fields["current_min_price_requests_number"],
+            last_response_duration=update_fields["current_min_price_last_response_duration"],
+            total_duration=update_fields["current_min_price_total_duration"],
+            last_updated=update_fields["current_min_price_last_updated"]
+        )
 
     @staticmethod
     async def execute():

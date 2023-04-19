@@ -9,8 +9,23 @@ import {OFFERS_URL} from "../../../config";
 
 export default ({offerId, className}) => {
     const [offer, setOffer] = useState(null);
-    const [currentMinPrice, setCurrentMinPrice] = useState(null);
     const [websocket, setWebsocket] = useState(null);
+
+    const [currentMinPriceExtra, setCurrentMinPriceExtra] = useState(false);
+    const [currentMinPrice, setCurrentMinPrice] = useState(null);
+    const [currentMinPriceFound, setCurrentMinPriceFound] = useState(null);
+    const [currentMinPriceLastResponseDuration, setCurrentMinPriceLastResponseDuration] = useState(null);
+    const [currentMinPriceLastUpdated, setCurrentMinPriceLastUpdated] = useState(null);
+    const [currentMinPriceRequestsNumber, setCurrentMinPriceRequestsNumber] = useState(null);
+    const [currentMinPriceTotalDuration, setCurrentMinPriceTotalDuration] = useState(null);
+
+    const formatTime = (timestr) => {
+        if (timestr) {
+            const date = new Date(timestr);
+            return date.toUTCString();
+        }
+        return null;
+    }
 
     useEffect(() => {
         if (offerId !== "new" && !websocket) {
@@ -22,8 +37,19 @@ export default ({offerId, className}) => {
             ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.type === "update-min-price") {
-                    const price = data.data.price.toFixed(2);
+                    const price = data.data.price ? data.data.price.toFixed(2) : null;
+                    const found = data.data.found;
+                    const lastResponseDuration = data.data.last_response_duration;
+                    const lastUpdated = data.data.last_updated;
+                    const requestsNumber = data.data.requests_number;
+                    const totalDuration = data.data.total_duration;
+
                     setCurrentMinPrice(price);
+                    setCurrentMinPriceFound(found);
+                    setCurrentMinPriceLastResponseDuration(lastResponseDuration);
+                    setCurrentMinPriceLastUpdated(formatTime(lastUpdated));
+                    setCurrentMinPriceRequestsNumber(requestsNumber);
+                    setCurrentMinPriceTotalDuration(totalDuration);
                 }
             }
         }
@@ -38,7 +64,12 @@ export default ({offerId, className}) => {
                 },
                 data => {
                     setOffer(data)
-                    setCurrentMinPrice(data.current_min_price.toFixed(2))
+                    setCurrentMinPrice(data.current_min_price.toFixed(2));
+                    setCurrentMinPriceRequestsNumber(data.current_min_price_requests_number);
+                    setCurrentMinPriceFound(data.current_min_price_found);
+                    setCurrentMinPriceLastResponseDuration(data.current_min_price_last_response_duration);
+                    setCurrentMinPriceTotalDuration(data.current_min_price_total_duration);
+                    setCurrentMinPriceLastUpdated(formatTime(data.current_min_price_last_updated));
                 }
             )
 
@@ -193,8 +224,21 @@ export default ({offerId, className}) => {
             <button className="offer-form__save-button" type={"submit"}>{offerId === "new" ? "Create" : "Update"}</button>
             {offerId !== "new" ? (
                 <div className="offer-form__after-button">
-                    <p>Current min price: {currentMinPrice} {offer.currency_code} / {offer.crypto_currency_code}</p>
-                    <p>Current price: {offer.current_price}</p>
+                    <p>Price: {offer.current_price}</p>
+                    <p>Min price: {currentMinPrice} {offer.currency_code} / {offer.crypto_currency_code}</p>
+                    <button type={"button"} onClick={() => {
+                        setCurrentMinPriceExtra(!currentMinPriceExtra);
+                    }}>Show min price info</button>
+                    {currentMinPriceExtra ? (
+                        <>
+                            <p>Min price (last updated): {currentMinPriceLastUpdated ? currentMinPriceLastUpdated : "-"}</p>
+                            <p>Min price (found): {currentMinPriceFound ? "found" : "not found"}</p>
+                            <p>Min price (requests number): {currentMinPriceRequestsNumber ? currentMinPriceRequestsNumber : "-"}</p>
+                            <p>Min price (total duration): {currentMinPriceTotalDuration ? currentMinPriceTotalDuration / 1000000 : "-"}</p>
+                            <p>Min price (last response duration): {currentMinPriceLastResponseDuration ? currentMinPriceLastResponseDuration / 1000000 : "-"}</p>
+                        </>
+                    ) : null}
+
                 </div>
             ) : null}
         </form>

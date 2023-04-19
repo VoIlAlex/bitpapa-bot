@@ -5,6 +5,7 @@ import Header from "../../sections/Header";
 import OfferForm from "../../sections/OfferForm";
 import {Helmet} from "react-helmet";
 import Footer from "../../sections/Footer";
+import ErrorSection from "../../sections/ErrorSection";
 
 export default () => {
     const { offerId } = useParams();
@@ -16,6 +17,7 @@ export default () => {
                 <title>{offerId === "new" ? "New offer" : `Offer #${offerId}`} | Bitpapa BOT</title>
             </Helmet>
             <Header />
+            <ErrorSection />
             <div className="offer-page__form-container">
                 <OfferForm className="offer-page__form" offerId={offerId}/>
             </div>

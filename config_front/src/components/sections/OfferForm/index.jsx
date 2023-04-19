@@ -6,10 +6,21 @@ import {compileRequest} from "../../../requests/base";
 import Header from "../../sections/Header";
 import classNames from "classnames";
 import {OFFERS_URL} from "../../../config";
+import {useRecoilState} from "recoil";
+import {errorAtom} from "../../../recoil/atoms";
 
 export default ({offerId, className}) => {
     const [offer, setOffer] = useState(null);
+    const [error, setError] = useRecoilState(errorAtom);
     const [websocket, setWebsocket] = useState(null);
+
+    const [currentPriceExtra, setCurrentPriceExtra] = useState(false);
+    const [currentPrice, setCurrentPrice] = useState(null);
+    const [currentPriceLastUpdated, setCurrentPriceLastUpdated] = useState(null);
+    const [currentPriceTotalDuration, setCurrentPriceTotalDuration] = useState(null);
+    const [currentPriceLastRequestTime, setCurrentPriceLastRequestTime] = useState(null);
+    const [currentPriceLastRequestBlock, setCurrentPriceLastRequestBlock] = useState(null);
+
 
     const [currentMinPriceExtra, setCurrentMinPriceExtra] = useState(false);
     const [currentMinPrice, setCurrentMinPrice] = useState(null);
@@ -50,6 +61,18 @@ export default ({offerId, className}) => {
                     setCurrentMinPriceLastUpdated(formatTime(lastUpdated));
                     setCurrentMinPriceRequestsNumber(requestsNumber);
                     setCurrentMinPriceTotalDuration(totalDuration);
+                } else if (data.type === "update-price") {
+                    const price = data.data.price ? data.data.price.toFixed(2) : null;
+                    const lastUpdated = data.data.last_updated;
+                    const totalDuration = data.data.total_duration;
+                    const lastRequestTime = data.data.last_request_time;
+                    const lastRequestBlock = data.data.last_request_block;
+
+                    setCurrentPrice(price);
+                    setCurrentPriceLastUpdated(formatTime(lastUpdated));
+                    setCurrentPriceTotalDuration(totalDuration);
+                    setCurrentPriceLastRequestTime(formatTime(lastRequestTime));
+                    setCurrentPriceLastRequestBlock(lastRequestBlock);
                 }
             }
         }
@@ -64,7 +87,15 @@ export default ({offerId, className}) => {
                 },
                 data => {
                     setOffer(data)
-                    setCurrentMinPrice(data.current_min_price.toFixed(2));
+                    setError(data.init_error);
+
+                    setCurrentPrice(data.current_price ? data.current_price.toFixed(2) : null);
+                    setCurrentPriceLastUpdated(formatTime(data.current_price_last_updated));
+                    setCurrentPriceTotalDuration(data.current_price_total_duration);
+                    setCurrentPriceLastRequestTime(formatTime(data.current_price_last_request_time));
+                    setCurrentPriceLastRequestBlock(data.current_price_last_request_block);
+
+                    setCurrentMinPrice(data.current_min_price ? data.current_min_price.toFixed(2) : null);
                     setCurrentMinPriceRequestsNumber(data.current_min_price_requests_number);
                     setCurrentMinPriceFound(data.current_min_price_found);
                     setCurrentMinPriceLastResponseDuration(data.current_min_price_last_response_duration);
@@ -221,10 +252,35 @@ export default ({offerId, className}) => {
                     })
                 }/>
             </div>
+            <div className="offer-form__checkbox-item">
+                <label className="offer-form__label" itemID="is_initialized">Is initialized:</label>
+                <input
+                    className="offer-form__checkbox"
+                    id="is_initialized"
+                    type={"checkbox"}
+                    checked={offer.is_initialized}
+                    disabled
+                    onChange={e => setOffer({
+                        ...offer,
+                        is_initialized: e.target.checked
+                    })
+                }/>
+            </div>
             <button className="offer-form__save-button" type={"submit"}>{offerId === "new" ? "Create" : "Update"}</button>
             {offerId !== "new" ? (
                 <div className="offer-form__after-button">
-                    <p>Price: {offer.current_price}</p>
+                    <p>Price: {currentPrice} {offer.currency_code}</p>
+                    <button type={"button"} onClick={() => {
+                        setCurrentPriceExtra(!currentPriceExtra);
+                    }}>Show price info</button>
+                    {currentPriceExtra ? (
+                        <>
+                            <p>Price (last updated): {currentPriceLastUpdated ? currentPriceLastUpdated : "-"}</p>
+                            <p>Price (total duration): {currentPriceTotalDuration ? currentPriceTotalDuration / 1000000 : "-"} seconds</p>
+                            <p>Price (last request): {currentPriceLastRequestTime ? currentPriceLastRequestTime : "-"}</p>
+                            <p>Price (last request block): {currentPriceLastRequestBlock ? currentPriceLastRequestBlock : "-"} seconds</p>
+                        </>
+                    ) : null}
                     <p>Min price: {currentMinPrice} {offer.currency_code} / {offer.crypto_currency_code}</p>
                     <button type={"button"} onClick={() => {
                         setCurrentMinPriceExtra(!currentMinPriceExtra);
@@ -234,8 +290,8 @@ export default ({offerId, className}) => {
                             <p>Min price (last updated): {currentMinPriceLastUpdated ? currentMinPriceLastUpdated : "-"}</p>
                             <p>Min price (found): {currentMinPriceFound ? "found" : "not found"}</p>
                             <p>Min price (requests number): {currentMinPriceRequestsNumber ? currentMinPriceRequestsNumber : "-"}</p>
-                            <p>Min price (total duration): {currentMinPriceTotalDuration ? currentMinPriceTotalDuration / 1000000 : "-"}</p>
-                            <p>Min price (last response duration): {currentMinPriceLastResponseDuration ? currentMinPriceLastResponseDuration / 1000000 : "-"}</p>
+                            <p>Min price (total duration): {currentMinPriceTotalDuration ? currentMinPriceTotalDuration / 1000000 : "-"} seconds</p>
+                            <p>Min price (last response duration): {currentMinPriceLastResponseDuration ? currentMinPriceLastResponseDuration / 1000000 : "-"} seconds</p>
                         </>
                     ) : null}
 

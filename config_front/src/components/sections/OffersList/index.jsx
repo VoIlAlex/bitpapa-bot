@@ -44,7 +44,15 @@ export default ({className}) => {
                     offers.map(offer => (
                         <div className="offers-list__list-item">
                             <a className="offers-list__list-item-link" href={"/offers/" + offer.id}>
-                                <div className="offers-list__list-item-container">
+                                <div className={
+                                    classNames(
+                                        "offers-list__list-item-container",
+                                        {
+                                            "error": !offer.is_initialized && offer.init_error !== null,
+                                            "pending": !offer.is_initialized && offer.init_error === null,
+                                        }
+                                    )
+                                }>
                                     <p className="offers-list__list-item-text">{offer.number}</p>
                                 </div>
                             </a>

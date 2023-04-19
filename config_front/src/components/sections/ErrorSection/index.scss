@@ -1,0 +1,14 @@
+.error-section {
+  background-color: #ff5151;
+  color: white;
+  padding: 20px;
+  white-space: pre-wrap;
+
+  .error-section__header {
+    margin: 0;
+    font-size: 20px;
+  }
+  .error_section__text {
+    margin: 0;
+  }
+}

@@ -81,7 +81,7 @@ class TaskUpdateOffer(Task):
                         )
                         await TaskUpdateOffer.send_websocket_message(
                             offer_id=offer.id,
-                            price=price_to_set,
+                            price=offer.current_price,
                             total_duration=offer.current_price_total_duration,
                             last_updated=offer.current_price_last_updated,
                             last_request_time=datetime.now(timezone.utc),

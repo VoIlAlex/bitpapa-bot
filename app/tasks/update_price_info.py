@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 class TaskUpdatePriceInfo(Task):
     @staticmethod
     def _elapsed_time_microseconds(start_time: datetime):
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         return int((now - start_time).total_seconds() * 1000000)
 
     @staticmethod
@@ -77,12 +77,12 @@ class TaskUpdatePriceInfo(Task):
         pages = -1
         page = 0
 
-        start_time = datetime.now()
+        start_time = datetime.now(timezone.utc)
         response_time: Optional[str, None] = None
         min_price_to_set: Optional[str, None] = None
 
         while pages == -1 or page <= pages:
-            iteration_start_time = datetime.now()
+            iteration_start_time = datetime.now(timezone.utc)
             results = await client.search(
                 crypto_currency_code=offer.crypto_currency_code,
                 type_="Ad::Sell",
@@ -110,7 +110,7 @@ class TaskUpdatePriceInfo(Task):
                 break
 
         update_fields = {
-            "current_min_price_last_updated": datetime.now(),
+            "current_min_price_last_updated": datetime.now(timezone.utc),
             "current_min_price_last_response_duration": response_time,
             "current_min_price_total_duration": TaskUpdatePriceInfo._elapsed_time_microseconds(start_time),
             "current_min_price_requests_number": page

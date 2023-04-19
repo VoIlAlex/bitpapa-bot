@@ -20,7 +20,9 @@ class OfferOutput(BaseModel):
 
     current_price: Optional[float]
     current_price_last_updated: Optional[datetime]
-    current_price_last_response_duration: Optional[int]
+    current_price_total_duration: Optional[int]
+    current_price_last_request_time: Optional[datetime]
+    current_price_last_request_block: Optional[int]
 
     current_min_price: Optional[float]
     current_min_price_last_updated: Optional[datetime]

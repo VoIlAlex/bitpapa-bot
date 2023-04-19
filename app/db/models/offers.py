@@ -31,7 +31,9 @@ class Offer(Base):
 
     current_price = Column(DECIMAL(12, 2), nullable=True)
     current_price_last_updated = Column(DateTime(timezone=True), nullable=True)
-    current_price_last_response_duration = Column(Integer(), nullable=True)
+    current_price_total_duration = Column(Integer(), nullable=True)
+    current_price_last_request_time = Column(DateTime(timezone=True), nullable=True)
+    current_price_last_request_block = Column(Integer(), nullable=True)
 
     current_min_price = Column(DECIMAL(12, 2), nullable=True)
     current_min_price_last_updated = Column(DateTime(timezone=True), nullable=True)

@@ -5,10 +5,10 @@ from typing import Union
 
 import httpx
 
-from service.external.bitpapa.schema import SearchOffersResult
-
+from service.external.bitpapa.schema import SearchOffersResult, SearchOffer
 
 logger = logging.getLogger(__name__)
+
 
 class BitPapaClient:
     def __init__(self,
@@ -26,7 +26,7 @@ class BitPapaClient:
         limit: int = 10,
         page: int = 0,
         sort: str = "price"
-    ):
+    ) -> SearchOffersResult:
         url = f"{self.api_url}/pro/search"
         params = {}
         if crypto_currency_code is not None:
@@ -69,7 +69,7 @@ class BitPapaClient:
     ):
         url = f"{self.api_url}/pro/{offer_id}"
         body = {
-            "price": price
+            "equation": price
         }
         async with httpx.AsyncClient() as client:
             res = await client.put(
@@ -86,5 +86,26 @@ class BitPapaClient:
                 except Exception:
                     err_info = {}
                 raise RuntimeError("Request error.", res.status_code, err_info)
+
+    async def get_offer_by_number(
+        self,
+        number: str
+    ) -> SearchOffer:
+        url = f'{self.api_url}/pro/{number}'
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                url,
+                headers={
+                    "X-Access-Token": self.token
+                },
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
+
+            return SearchOffer(**res.json()["ad"])
 
 

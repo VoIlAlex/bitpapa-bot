@@ -1,0 +1,2 @@
+#!/bin/sh
+celery -A celery_app worker --loglevel=INFO

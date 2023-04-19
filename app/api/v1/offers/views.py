@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException, status
 
 from api.v1.offers.inputs import OfferInput
 from api.v1.offers.outputs import OfferOutput
+from celery_app import initialize_offer
 from db.models import Offer
 from service.auth.login import JWTService
 
@@ -33,6 +34,7 @@ async def create_offer_view(
     _=Depends(JWTService.get_current_user)
 ) -> OfferOutput:
     offer = await Offer.create(**data.dict())
+    initialize_offer.delay(offer_id=offer.id)
     return offer
 
 
@@ -47,8 +49,8 @@ async def update_offer_view(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Offer not found"
         )
-
-    await offer.update(**data.dict())
+    await offer.update(**data.dict(), is_initilized=False)
+    initialize_offer.delay(offer_id=offer.id)
     return offer
 
 

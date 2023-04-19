@@ -10,6 +10,7 @@ services:
       - ./.env
     depends_on:
       - postgres
+      - redis
     volumes:
       - ./app:/app
     entrypoint: ./entrypoints/config_server.entrypoint.sh
@@ -27,20 +28,35 @@ services:
       "nginx", "-g", "daemon off;"
     ]
 
-#  offer_updater:
-#    container_name: bitpapa_offer_updater
-#    build:
-#      context: ./app
-#      dockerfile: ../provision/Dockerfile.server
-#    env_file:
-#      - ./.env
-#    depends_on:
-#      - postgres
-#      - config_server
-#    volumes:
-#      - ./app:/app
-#    entrypoint: ./entrypoints/offer_updater.entrypoint.sh
-#
+  celery:
+    container_name: bitpapa_celery
+    build:
+      context: ./app
+      dockerfile: ../provision/Dockerfile.server
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+      - config_server
+    volumes:
+      - ./app:/app
+    entrypoint: ./entrypoints/celery.entrypoint.sh
+
+  offer_updater:
+    container_name: bitpapa_offer_updater
+    build:
+      context: ./app
+      dockerfile: ../provision/Dockerfile.server
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - config_server
+      - redis
+    volumes:
+      - ./app:/app
+    entrypoint: ./entrypoints/offer_updater.entrypoint.sh
+
   min_price_updater:
     container_name: bitpapa_min_price_updater
     build:
@@ -51,6 +67,7 @@ services:
     depends_on:
       - postgres
       - config_server
+      - redis
     volumes:
       - ./app:/app
     entrypoint: ./entrypoints/price_updater.entrypoint.sh
@@ -93,6 +110,8 @@ services:
     container_name: bitpapa_bot_postgres
     env_file:
       - ./.env
+    ports:
+      - "25438:5432"
     volumes:
       - data-postgres:/var/lib/postgresql/data
 

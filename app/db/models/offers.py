@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from sqlalchemy import Column, Integer, String, DateTime, select, DECIMAL, Boolean, Text, true
+from sqlalchemy import Column, Integer, String, DateTime, select, DECIMAL, Boolean, Text, true, BigInteger
 from sqlalchemy.sql import func
 from db.base import Base, AsyncSession
 
@@ -31,14 +31,14 @@ class Offer(Base):
 
     current_price = Column(DECIMAL(12, 2), nullable=True)
     current_price_last_updated = Column(DateTime(timezone=True), nullable=True)
-    current_price_total_duration = Column(Integer(), nullable=True)
+    current_price_total_duration = Column(BigInteger(), nullable=True)
     current_price_last_request_time = Column(DateTime(timezone=True), nullable=True)
     current_price_last_request_block = Column(Integer(), nullable=True)
 
     current_min_price = Column(DECIMAL(12, 2), nullable=True)
     current_min_price_last_updated = Column(DateTime(timezone=True), nullable=True)
-    current_min_price_last_response_duration = Column(Integer(), nullable=True)
-    current_min_price_total_duration = Column(Integer(), nullable=True)
+    current_min_price_last_response_duration = Column(BigInteger(), nullable=True)
+    current_min_price_total_duration = Column(BigInteger(), nullable=True)
     current_min_price_requests_number = Column(Integer(), nullable=True)
     current_min_price_found = Column(Boolean(), default=False, nullable=True)
 

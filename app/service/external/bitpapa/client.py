@@ -1,11 +1,14 @@
+import base64
 import json
 import logging
+import os.path
 from decimal import Decimal
-from typing import Union
+from typing import Union, Optional, List
 
 import httpx
 
-from service.external.bitpapa.schema import SearchOffersResult, SearchOffer
+from service.external.bitpapa.schema import SearchOffersResult, SearchOffer, TradeConversation, \
+    TradeConversationMessage, Trade
 
 logger = logging.getLogger(__name__)
 
@@ -108,4 +111,143 @@ class BitPapaClient:
 
             return SearchOffer(**res.json()["ad"])
 
+    async def cancel_trade(self, trade_id: str):
+        url = f'{self.api_url}/trades/{trade_id}/cancel'
+        async with httpx.AsyncClient() as client:
+            res = await client.post(
+                url,
+                headers={
+                    "X-Access-Token": self.token
+                }
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
 
+    async def complete_trade(self, trade_id: str):
+        url = f'{self.api_url}/trades/{trade_id}/complete'
+
+        async with httpx.AsyncClient() as client:
+            res = await client.post(
+                url,
+                headers={
+                    "X-Access-Token": self.token
+                }
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
+
+    async def get_trade_conversation(
+        self,
+        trade_id: str
+    ) -> TradeConversation:
+        url = f'{self.api_url}/trades/{trade_id}/trade_conversation'
+
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                url,
+                headers={
+                    "X-Access-Token": self.token
+                }
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
+
+        return TradeConversation(**res.json())
+
+    async def create_message_in_trade_conversation(
+        self,
+        trade_id: str,
+        body: str,
+        file_path: Optional[str] = None
+    ):
+        url = f'{self.api_url}/trades/{trade_id}/create_message_in_trade_conversation'
+
+        request_body = {
+            "body": body,
+            "filename": None,
+            "attachment": None
+        }
+
+        if file_path:
+            filename = os.path.split(file_path)[-1]
+            with open(file_path, 'rb') as f:
+                encoded_file = base64.b64encode(f.read())
+
+            request_body["filename"] = filename
+            request_body["attachment"] = encoded_file
+
+        async with httpx.AsyncClient() as client:
+            res = await client.post(
+                url,
+                headers={
+                    "X-Access-Token": self.token,
+                    "Content-Type": "application/json"
+                },
+                json=body
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
+
+            return TradeConversationMessage(**res.json())
+
+    async def get_trade(
+        self,
+        trade_id: str
+    ) -> Trade:
+        url = f'{self.api_url}/trades/{trade_id}'
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                url,
+                headers={
+                    "X-Access-Token": self.token
+                }
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
+
+        return Trade(**res.json()["trade"])
+
+    async def list_latest_trades(self) -> List[Trade]:
+        url = f'{self.api_url}/trades'
+
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                url,
+                params={
+                    'limit': 500,
+                    # 'type': 'buy',  # TODO: check correct type
+                    # 'status': 'opened',  # TODO: check correct status
+                    'sort': '-created_at'
+                },
+                headers={
+                    "X-Access-Token": self.token
+                }
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
+
+        return [Trade(**trade_data) for trade_data in res.json()["trades"]]

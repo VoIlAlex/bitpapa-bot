@@ -38,3 +38,63 @@ class SearchOffersResult(BaseModel):
     pages: int
     total: int
     ads: List[SearchOffer]
+
+
+class TradeConversationMessageUser(BaseModel):
+    id: str
+    user_name: str
+    online: bool
+    last_sign_in_at: datetime
+
+
+class TradeConversationMessageAttachment(BaseModel):
+    url: str
+    content_type: str
+
+
+class TradeConversationMessage(BaseModel):
+    id: str
+    user: TradeConversationMessageUser
+    body: str
+    date: datetime
+    attachment: Optional[TradeConversationMessageAttachment]
+    is_read: bool
+    external_id: str
+
+
+class TradeConversation(BaseModel):
+    messages: List[TradeConversationMessage]
+
+
+class TradeAd(BaseModel):
+    id: str
+    type: str
+
+
+class TradeContractor(BaseModel):
+    id: str
+    user_name: str
+
+
+class TradeTransaction(BaseModel):
+    url: str
+    txid: str
+
+
+class Trade(BaseModel):
+    id: str
+    ad: TradeAd
+    contractor: TradeContractor
+    amount: float
+    status: str
+    price: float
+    cost: float
+    created_at: datetime
+    conversation_id: str
+    completed_at: Optional[datetime]
+    cancelled_at: Optional[datetime]
+    paid_confirmed_at: Optional[datetime]
+    escrow_expired_at: Optional[datetime]
+    transaction: TradeTransaction
+    current_time: str
+    is_first: bool

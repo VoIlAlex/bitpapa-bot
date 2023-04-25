@@ -53,6 +53,13 @@ class Offer(Base):
             return result.scalar()
 
     @staticmethod
+    async def get_by_external_id(offer_id: str) -> Optional["Offer"]:
+        async with AsyncSession() as session:
+            query = select(Offer).where(Offer.number == offer_id)
+            result = await session.execute(query)
+            return result.scalar()
+
+    @staticmethod
     async def get_all() -> List["Offer"]:
         async with AsyncSession() as session:
             query = select(Offer)

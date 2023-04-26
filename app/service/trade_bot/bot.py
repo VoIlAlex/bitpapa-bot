@@ -199,10 +199,23 @@ class TradeBot:
         if trade.external_status and trade.external_status in [
             TradeRemoteStatus.CANCELLED.value,
             TradeRemoteStatus.CANCELLED_BY_ADMIN.value,
-            TradeRemoteStatus.CANCELLED_BY_BUYER.value
+            TradeRemoteStatus.CANCELLED_BY_BUYER.value,
+            TradeRemoteStatus.COMPLETED.value,
+            TradeRemoteStatus.COMPLETED_BY_SELLER.value,
+            TradeRemoteStatus.COMPLETED_BY_ADMIN.value,
         ]:
             await trade.update(
                 status=TradeStatus.CANCELED.value
+            )
+            return
+
+        if trade.external_status and trade.external_status in [
+            TradeRemoteStatus.COMPLETED.value,
+            TradeRemoteStatus.COMPLETED_BY_SELLER.value,
+            TradeRemoteStatus.COMPLETED_BY_ADMIN.value,
+        ]:
+            await trade.update(
+                status=TradeStatus.COMPLETED.value
             )
             return
 

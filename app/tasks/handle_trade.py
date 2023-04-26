@@ -7,10 +7,13 @@ from tasks.base import Task
 
 
 class TaskHandleTrade(Task):
-
     @staticmethod
     async def execute():
         client = BitPapaClient(config.BITPAPA_TOKEN)
         trades = await client.list_latest_trades()
-        bots = [TradeBot(bitpapa_client=client, trade_id=trade.id) for trade in trades]
+        bots = [TradeBot(
+            bitpapa_client=client,
+            trade_id=trade.id,
+            offer_id=trade.ad.id
+        ) for trade in trades]
         await asyncio.gather(*[bot.process() for bot in bots])

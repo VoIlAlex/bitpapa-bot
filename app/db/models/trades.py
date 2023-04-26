@@ -23,7 +23,9 @@ class TradeRemoteStatus(enum.Enum):
 
 class TradeStatus(enum.Enum):
     NEW = "new"
-    HELLO_MESSAGE_SENT = "hello"
+    PAID = "paid"
+    COMPLETED = "completed"
+    CANCELED = "canceled"
 
 
 class Trade(Base):
@@ -39,10 +41,11 @@ class Trade(Base):
     contractor_user_name = Column(String(255))
 
     amount = Column(DECIMAL(12, 2))
-    status = Column(String(127))
+    status = Column(String(127), default=TradeStatus.NEW.value)
     price = Column(DECIMAL(12, 2))
     cost = Column(DECIMAL(12, 2))
 
+    external_status = Column(String(127))
     external_created_at = Column(DateTime(timezone=True))
     external_completed_at = Column(DateTime(timezone=True), nullable=True)
     external_cancelled_at = Column(DateTime(timezone=True), nullable=True)
@@ -53,6 +56,8 @@ class Trade(Base):
     transaction_txid = Column(String(512), nullable=True)
 
     is_first = Column(Boolean(), default=False)
+    greeting_sent = Column(Boolean(), default=False)
+    requisites_sent = Column(Boolean(), default=False)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -180,3 +185,85 @@ class TradeMessage(Base):
             session.add(self)
             await session.commit()
             await session.refresh(self)
+
+
+class TradeQiwiBill(Base):
+    __tablename__ = "trades_bills"
+
+    id = Column(Integer(), autoincrement=True, primary_key=True, index=True)
+
+    site_id = Column(String(127))
+    bill_id = Column(String(255), nullable=False)
+    amount_currency = Column(String(16), nullable=False)
+    amount_value = Column(String(127), nullable=False)
+
+    status_value = Column(String(63), nullable=False)
+    status_changed_date_time = Column(DateTime(timezone=True))
+
+    customer_phone = Column(String(63), nullable=True)
+    customer_email = Column(String(63), nullable=True)
+    customer_account = Column(String(63), nullable=True)
+
+    comment = Column(Text(), nullable=True)
+    creation_date_time = Column(DateTime(timezone=True))
+    expiration_date_time = Column(DateTime(timezone=True))
+    pay_url = Column(String(255), nullable=False)
+
+    trade_id = Column(ForeignKey("trades.id"), nullable=False, unique=True)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    @staticmethod
+    async def create(
+        site_id: str,
+        bill_id: str,
+        amount_currency: str,
+        amount_value: str,
+        status_value: str,
+        status_changed_date_time: datetime,
+        customer_phone: str,
+        customer_email: str,
+        customer_account: str,
+        comment: str,
+        creation_date_time: datetime,
+        expiration_date_time: datetime,
+        pay_url: str,
+        trade_id: int
+    ):
+        async with AsyncSession() as session:
+            trade_bill = TradeQiwiBill(
+                site_id=site_id,
+                bill_id=bill_id,
+                amount_currency=amount_currency,
+                amount_value=amount_value,
+                status_value=status_value,
+                status_changed_date_time=status_changed_date_time,
+                customer_phone=customer_phone,
+                customer_email=customer_email,
+                customer_account=customer_account,
+                comment=comment,
+                creation_date_time=creation_date_time,
+                expiration_date_time=expiration_date_time,
+                pay_url=pay_url,
+                trade_id=trade_id
+            )
+            session.add(trade_bill)
+            await session.commit()
+            await session.refresh(trade_bill)
+        return trade_bill
+
+    async def update(self, **kwargs):
+        async with AsyncSession() as session:
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+            session.add(self)
+            await session.commit()
+            await session.refresh(self)
+
+    @staticmethod
+    async def get_by_trade_id(id_: int) -> Optional["TradeQiwiBill"]:
+        async with AsyncSession() as session:
+            query = select(TradeQiwiBill).where(TradeQiwiBill.trade_id == id_)
+            result = await session.execute(query)
+            return result.scalar()

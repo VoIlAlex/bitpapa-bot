@@ -27,5 +27,14 @@ class Config(BaseConfig):
 
     BITPAPA_TOKEN = os.getenv("BITPAPA_TOKEN")
 
+    MESSAGE_GREETING_DEFAULT_TEMPLATE = "Hi! I'm the bot."
+    MESSAGE_BILL_DEFAULT_TEMPLATE = "Your bill: {bill_url}."
+    MESSAGE_CANCEL_TEMPLATE = "The qiwi transaction was canceled or expired."
+    MESSAGE_PAID_TEMPLATE = "Your payment was approved. Please, wait."
+
+    QIWI_BILL_EXPIRATION_DELTA = 1 * 60 * 60
+    QIWI_SITE_ID = os.getenv("QIWI_SITE_ID")
+    QIWI_TOKEN = os.getenv("QIWI_TOKEN")
+
 
 config = Config()

@@ -200,9 +200,6 @@ class TradeBot:
             TradeRemoteStatus.CANCELLED.value,
             TradeRemoteStatus.CANCELLED_BY_ADMIN.value,
             TradeRemoteStatus.CANCELLED_BY_BUYER.value,
-            TradeRemoteStatus.COMPLETED.value,
-            TradeRemoteStatus.COMPLETED_BY_SELLER.value,
-            TradeRemoteStatus.COMPLETED_BY_ADMIN.value,
         ]:
             await trade.update(
                 status=TradeStatus.CANCELED.value

@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Union, Dict
+from typing import Union, Dict, Optional
 from decimal import Decimal
 
 import httpx
@@ -24,8 +24,8 @@ class QiwiClient:
         comment: str,
         expiration_date_time: datetime,
         customer_phone: str,
-        customer_email: str,
-        customer_account: str,
+        customer_email: Optional[str],
+        customer_account: Optional[str],
         custom_fields: Dict[str, str]
     ) -> Bill:
         url = f'{self.qiwi_api_url}/partner/bill/v1/bills/{bill_id}'

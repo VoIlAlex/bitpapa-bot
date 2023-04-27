@@ -39,6 +39,7 @@ class Trade(Base):
 
     contractor_id = Column(String(255))
     contractor_user_name = Column(String(255))
+    contractor_phone = Column(String(127), nullable=True)
 
     amount = Column(DECIMAL(12, 2))
     status = Column(String(127), default=TradeStatus.NEW.value)

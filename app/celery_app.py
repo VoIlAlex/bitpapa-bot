@@ -5,6 +5,7 @@ from celery import Celery
 from config import config
 from db.models import Offer
 from service.external.bitpapa.client import BitPapaClient
+from tasks.update_course import TaskUpdateCourse
 
 app = Celery('tasks', broker=f'{config.REDIS_URL}/1')
 
@@ -20,7 +21,10 @@ async def _initialize_offer(offer_id: int):
             is_initialized=False
         )
         return
-
+    await TaskUpdateCourse.execute(
+        crypto_currency_code=offer_data.crypto_currency_code,
+        currency_code=offer_data.crypto_currency_code
+    )
     await offer.update(
         crypto_currency_code=offer_data.crypto_currency_code,
         currency_code=offer_data.currency_code,

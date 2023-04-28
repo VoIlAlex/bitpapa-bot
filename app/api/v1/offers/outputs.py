@@ -18,6 +18,9 @@ class OfferOutput(BaseModel):
     search_price_limit_max: float
     search_minutes_offline_max: float
 
+    search_amount_limit_min: float
+    search_amount_limit_max: float
+
     current_price: Optional[float]
     current_price_last_updated: Optional[datetime]
     current_price_total_duration: Optional[int]

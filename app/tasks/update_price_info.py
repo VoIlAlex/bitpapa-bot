@@ -27,6 +27,8 @@ class TaskUpdatePriceInfo(Task):
         offer_data: SearchOffer,
         price_limit_max: Union[Decimal, float],
         price_limit_min: Union[Decimal, float],
+        amount_limit_min: Union[Decimal, float],
+        amount_limit_max: Union[Decimal, float],
         minutes_offline_max: int
     ):
         if offer_data.price < price_limit_min:
@@ -34,6 +36,12 @@ class TaskUpdatePriceInfo(Task):
             return False
         if offer_data.price > price_limit_max:
             logger.info(f"Max: {price_limit_max} Current: {offer_data.price}")
+            return False
+        if offer_data.limit_max > amount_limit_max:
+            logger.info(f"Amount max: {amount_limit_max}. Current range: {offer_data.limit_min}-{offer_data.limit_max}")
+            return False
+        if offer_data.limit_min < amount_limit_min:
+            logger.info(f"Amount min: {amount_limit_min}. Current range: {offer_data.limit_min}-{offer_data.limit_max}")
             return False
         if not offer_data.user.online:
             minutes_offline = (
@@ -99,6 +107,8 @@ class TaskUpdatePriceInfo(Task):
                     offer_data=ad,
                     price_limit_min=offer.search_price_limit_min,
                     price_limit_max=offer.search_price_limit_max,
+                    amount_limit_min=offer.search_amount_limit_min,
+                    amount_limit_max=offer.search_amount_limit_max,
                     minutes_offline_max=offer.search_minutes_offline_max
                 )
                 if ad_match:

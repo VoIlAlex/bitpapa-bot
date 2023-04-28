@@ -21,6 +21,9 @@ class Offer(Base):
     search_price_limit_max = Column(DECIMAL(12, 2), nullable=False)
     search_minutes_offline_max = Column(Integer(), nullable=False)
 
+    search_amount_limit_min = Column(DECIMAL(12, 8), nullable=False, server_default="0.0")
+    search_amount_limit_max = Column(DECIMAL(12, 8), nullable=False, server_default="0.0")
+
     is_initialized = Column(Boolean(), nullable=False, default=False)
     init_error = Column(Text(), nullable=True, default=None)
     is_active = Column(Boolean(), nullable=False, default=True)

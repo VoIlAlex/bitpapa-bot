@@ -6,7 +6,7 @@ from traceback import print_exc
 
 import redis.asyncio as redis
 from config import config
-from db.models import Offer
+from db.models import Offer, Course
 from service.external.bitpapa.client import BitPapaClient
 from tasks.base import Task
 
@@ -56,7 +56,20 @@ class TaskUpdateOffer(Task):
                     return int(block_data[0])
 
     @staticmethod
-    async def update_offer_price(offer):
+    async def get_min_possible_price(offer: Offer) -> float:
+        course = await Course.get(
+            crypto_currency_code=offer.crypto_currency_code,
+            currency_code=offer.crypto_currency_code
+        )
+        if course is None:
+            raise RuntimeError(
+                f"Course not found for currency_code={offer.currency_code} "
+                f"and crypto_currency_code={offer.crypto_currency_code}"
+            )
+        return course.price * offer.min_price
+
+    @staticmethod
+    async def update_offer_price(offer: Offer):
         if offer.current_price_last_request_time and offer.current_price_last_request_block:
             time_passed = (datetime.now(timezone.utc) - offer.current_price_last_request_time).total_seconds()
             if time_passed < offer.current_price_last_request_block:
@@ -67,7 +80,8 @@ class TaskUpdateOffer(Task):
         )
         if offer.current_min_price:
             start_time = datetime.now(timezone.utc)
-            price_to_set = max(offer.current_min_price - offer.beat_price_by, offer.min_price)
+            min_possible_price = await TaskUpdateOffer.get_min_possible_price(offer)
+            price_to_set = max(offer.current_min_price - offer.beat_price_by, min_possible_price)
             if offer.current_price is None or offer.current_price != price_to_set:
                 try:
                     await client.update_offer(offer.number, float(price_to_set))

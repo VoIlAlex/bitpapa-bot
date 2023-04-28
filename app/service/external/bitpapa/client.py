@@ -8,7 +8,7 @@ from typing import Union, Optional, List
 import httpx
 
 from service.external.bitpapa.schema import SearchOffersResult, SearchOffer, TradeConversation, \
-    TradeConversationMessage, Trade
+    TradeConversationMessage, Trade, ExchangeRate
 
 logger = logging.getLogger(__name__)
 
@@ -251,3 +251,33 @@ class BitPapaClient:
                 raise RuntimeError("Request error.", res.status_code, err_info)
 
         return [Trade(**trade_data) for trade_data in res.json()["trades"]]
+
+    async def get_exchange_rates(self) -> List[ExchangeRate]:
+        url = f'{self.api_url}/exchange_rates/all'
+
+        async with httpx.AsyncClient() as client:
+            res = await client.get(
+                url,
+                headers={
+                    "X-Access-Token": self.token
+                }
+            )
+            if res.status_code != 200:
+                try:
+                    err_info = res.json()
+                except Exception:
+                    err_info = {}
+                raise RuntimeError("Request error.", res.status_code, err_info)
+
+        rates = []
+
+        data = res.json()
+        for rate_key, rate_value in data["rates"].items():
+            crypto_currency_code, currency_code = rate_key.split("_")
+            rates.append(ExchangeRate(
+                crypto_currency_code=crypto_currency_code,
+                currency_code=currency_code,
+                price=rate_value
+            ))
+
+        return rates

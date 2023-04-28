@@ -77,5 +77,11 @@ def start_trade_handler():
     TaskHandleTrade.start_loop()
 
 
+@start_group.command("course_updater")
+def start_course_updater():
+    from tasks.update_course import TaskUpdateCourse
+    TaskUpdateCourse.start_loop()
+
+
 if __name__ == '__main__':
     cli()

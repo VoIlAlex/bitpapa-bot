@@ -98,3 +98,9 @@ class Trade(BaseModel):
     transaction: TradeTransaction
     current_time: str
     is_first: bool
+
+
+class ExchangeRate(BaseModel):
+    currency_code: str
+    crypto_currency_code: str
+    price: float

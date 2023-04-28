@@ -72,6 +72,20 @@ services:
       - ./app:/app
     entrypoint: ./entrypoints/price_updater.entrypoint.sh
 
+  course_updater:
+    container_name: bitpapa_course_updater
+    build:
+      context: ./app
+      dockerfile: ../provision/Dockerfile.server
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - config_server
+    volumes:
+      - ./app:/app
+    entrypoint: ./entrypoints/course_updater.entrypoint.sh
+
 #  trade_handler:
 #    container_name: bitpapa_trade_handler
 #    build:

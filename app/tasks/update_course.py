@@ -1,16 +1,12 @@
 import asyncio
-import json
-import redis.asyncio as redis
-from datetime import datetime, timezone
-from decimal import Decimal
 from logging import getLogger
-from typing import Union, Optional, List
+from typing import List
 
 from config import config
 from db.models import Offer
 from db.models.courses import Course
 from service.external.bitpapa.client import BitPapaClient
-from service.external.bitpapa.schema import SearchOffer, ExchangeRate
+from service.external.bitpapa.schema import ExchangeRate
 from tasks.base import Task
 
 
@@ -34,10 +30,13 @@ class TaskUpdateCourse(Task):
                     break
 
     @staticmethod
-    async def execute():
-        offers = await Offer.get_all_active()
-        logger.info(f"Offers to process: {', '.join(str(offer.id) for offer in offers)}")
-        currencies_to_update = set([(o.crypto_currency_code, o.currency_code) for o in offers])
+    async def execute(crypto_currency_code: str = None, currency_code: str = None):
+        if not crypto_currency_code and not currency_code:
+            offers = await Offer.get_all_active()
+            logger.info(f"Offers to process: {', '.join(str(offer.id) for offer in offers)}")
+            currencies_to_update = set([(o.crypto_currency_code, o.currency_code) for o in offers])
+        else:
+            currencies_to_update = [(crypto_currency_code, currency_code)]
         bitpapa_client = BitPapaClient(token=config.BITPAPA_TOKEN)
         courses_list = await bitpapa_client.get_exchange_rates()
         tasks = [

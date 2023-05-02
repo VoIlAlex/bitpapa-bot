@@ -29,10 +29,12 @@ class Config(BaseConfig):
 
     MESSAGE_GREETING_DEFAULT_TEMPLATE = "Hi! I'm the bot."
     MESSAGE_BILL_DEFAULT_TEMPLATE = "Your bill: {bill_url}."
-    MESSAGE_CANCEL_TEMPLATE = "The qiwi transaction was canceled or expired."
+    MESSAGE_PAYMENT_FAILED = "Payment failed."
     MESSAGE_PAID_TEMPLATE = "Your payment was approved. Please, wait."
     MESSAGE_WRONG_PHONE_FORMAT = "Wrong phone format."
     MESSAGE_PHONE_SUCCESS = "Phone information saved."
+
+    ALLOWED_PAYMENT_METHOD_CODES = ["QIWI"]
 
     QIWI_BILL_EXPIRATION_DELTA = 1 * 60 * 60
     QIWI_SITE_ID = os.getenv("QIWI_SITE_ID")

@@ -5,6 +5,7 @@ from time import sleep
 
 import redis.asyncio as redis
 import async_timeout
+import websockets.exceptions
 from fastapi import WebSocket, Depends
 
 from config import config
@@ -52,3 +53,6 @@ async def websocket_endpoint(
                 await websocket.send_json(message_data)
         except asyncio.TimeoutError:
             ...
+        except websockets.exceptions.ConnectionClosedError:
+            await websocket.close()
+            break

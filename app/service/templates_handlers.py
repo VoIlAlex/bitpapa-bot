@@ -26,10 +26,6 @@ def get_bill_text(bill_url: str) -> str:
     )
 
 
-def get_cancel_text() -> str:
-    return get_template("cancel", config.MESSAGE_CANCEL_TEMPLATE)
-
-
 def get_paid_text() -> str:
     return get_template("paid", config.MESSAGE_PAID_TEMPLATE)
 
@@ -41,3 +37,6 @@ def get_wrong_phone_format_text() -> str:
 def get_phone_success_text() -> str:
     return get_template("phone_success", config.MESSAGE_PHONE_SUCCESS)
 
+
+def get_payment_failed_text() -> str:
+    return get_template("payment_failed", config.MESSAGE_PAYMENT_FAILED)

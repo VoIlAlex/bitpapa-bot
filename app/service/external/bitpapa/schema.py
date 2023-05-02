@@ -1,8 +1,14 @@
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
+
+
+class OfferType(Enum):
+    SELL = "Ad::Sell"
+    BUY = "Ad::Buy"
 
 
 class SearchOfferUser(BaseModel):
@@ -54,7 +60,16 @@ class TradeConversationMessageAttachment(BaseModel):
 
 class TradeConversationMessage(BaseModel):
     id: str
-    user: TradeConversationMessageUser
+    user_id: str
+    body: str
+    date: datetime
+    attachment: Optional[TradeConversationMessageAttachment]
+    is_read: bool
+    external_id: str
+
+
+class TradeConversationMessageSent(BaseModel):
+    id: str
     body: str
     date: datetime
     attachment: Optional[TradeConversationMessageAttachment]
@@ -77,8 +92,8 @@ class TradeContractor(BaseModel):
 
 
 class TradeTransaction(BaseModel):
-    url: str
-    txid: str
+    url: Optional[str]
+    txid: Optional[str]
 
 
 class Trade(BaseModel):
@@ -96,7 +111,6 @@ class Trade(BaseModel):
     paid_confirmed_at: Optional[datetime]
     escrow_expired_at: Optional[datetime]
     transaction: TradeTransaction
-    current_time: str
     is_first: bool
 
 

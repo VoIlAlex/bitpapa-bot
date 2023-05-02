@@ -64,7 +64,6 @@ class QiwiClient:
 
                 logger.error("Error while handling request on creating bill.")
                 raise RuntimeError("Error while request.", res.status_code, err_info)
-
             return Bill(**res.json())
 
     async def get_bill(self, bill_id: str):

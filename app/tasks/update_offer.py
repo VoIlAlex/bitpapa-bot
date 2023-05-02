@@ -2,6 +2,7 @@ import asyncio
 import json
 import re
 from datetime import datetime, timezone
+from logging import getLogger
 from traceback import print_exc
 
 import redis.asyncio as redis
@@ -9,6 +10,9 @@ from config import config
 from db.models import Offer, Course
 from service.external.bitpapa.client import BitPapaClient
 from tasks.base import Task
+
+
+logger = getLogger(__name__)
 
 
 class TaskUpdateOffer(Task):
@@ -86,6 +90,7 @@ class TaskUpdateOffer(Task):
                 try:
                     await client.update_offer(offer.number, float(price_to_set))
                 except RuntimeError as e:
+                    logger.error(f"Unable to update an offer. \n{e.args}")
                     try:
                         message, status_code, err_info = e.args
                         block = TaskUpdateOffer._parse_block(err_info)

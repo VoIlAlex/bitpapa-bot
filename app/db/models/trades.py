@@ -26,6 +26,7 @@ class TradeStatus(enum.Enum):
     PAID = "paid"
     COMPLETED = "completed"
     CANCELED = "canceled"
+    PAYMENT_NOT_RECEIVED = "pnr"
 
 
 class Trade(Base):
@@ -84,8 +85,8 @@ class Trade(Base):
         external_conversation_id: str,
         contractor_id: str,
         contractor_user_name: str,
+        external_status: str,
         amount: float,
-        status: str,
         price: float,
         cost: float,
         external_created_at: datetime,
@@ -96,12 +97,14 @@ class Trade(Base):
         transaction_url: str,
         transaction_txid: str,
         is_first: bool,
+        status: str = TradeStatus.NEW.value,
     ):
         async with AsyncSession() as session:
             trade = Trade(
                 external_id=external_id,
                 external_ad_id=external_ad_id,
                 external_conversation_id=external_conversation_id,
+                external_status=external_status,
                 contractor_id=contractor_id,
                 contractor_user_name=contractor_user_name,
                 amount=amount,
@@ -159,7 +162,7 @@ class TradeMessage(Base):
         async with AsyncSession() as session:
             for data_item in data:
                 query = select(TradeMessage).where(TradeMessage.external_id == data_item["external_id"])
-                result = session.execute(query)
+                result = await session.execute(query)
                 message = result.scalar()
 
                 if message:
@@ -167,9 +170,7 @@ class TradeMessage(Base):
                         setattr(message, key, value)
                     session.add(message)
                 else:
-                    message = TradeMessage({
-                        **data_item
-                    })
+                    message = TradeMessage(**data_item)
                     session.add(message)
 
                 await session.flush()

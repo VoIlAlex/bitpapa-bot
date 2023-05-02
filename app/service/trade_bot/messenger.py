@@ -1,6 +1,6 @@
 from service.external.bitpapa.client import BitPapaClient
 from service.templates_handlers import get_phone_success_text, get_wrong_phone_format_text, get_greeting_text, \
-    get_cancel_text, get_paid_text, get_bill_text
+    get_paid_text, get_bill_text, get_payment_failed_text
 
 
 class TradeBotMessenger:
@@ -29,8 +29,8 @@ class TradeBotMessenger:
             body=text
         )
 
-    async def send_cancel_message(self):
-        cancel_message = get_cancel_text()
+    async def send_payment_failed(self):
+        cancel_message = get_payment_failed_text()
         await self.bitpapa_client.create_message_in_trade_conversation(
             trade_id=self.trade_id,
             body=cancel_message

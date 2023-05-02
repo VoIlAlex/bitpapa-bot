@@ -21,8 +21,11 @@ class Offer(Base):
     search_price_limit_max = Column(DECIMAL(12, 2), nullable=False)
     search_minutes_offline_max = Column(Integer(), nullable=False)
 
-    search_amount_limit_min = Column(DECIMAL(12, 8), nullable=False, server_default="0.0")
-    search_amount_limit_max = Column(DECIMAL(12, 8), nullable=False, server_default="0.0")
+    search_amount_limit_min = Column(DECIMAL(12, 2), nullable=False, server_default="0.0")
+    search_amount_limit_max = Column(DECIMAL(12, 2), nullable=False, server_default="0.0")
+
+    user_id = Column(String(255), nullable=True)
+    user_name = Column(String(255), nullable=True)
 
     is_initialized = Column(Boolean(), nullable=False, default=False)
     init_error = Column(Text(), nullable=True, default=None)

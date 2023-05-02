@@ -43,24 +43,24 @@ class TradeBotSyncer:
         }
 
         if not trade:
-            await Trade.create(**data_to_save)
+            trade = await Trade.create(**data_to_save)
         else:
             await trade.update(**data_to_save)
         return trade
 
-    async def sync_messages(self, trade_internal_id: int):
+    async def sync_messages(self, trade_internal_id: int, skip_user_id: str = None):
         messages_res = await self.bitpapa_client.get_trade_conversation(self.trade_id)
+        messages_data = [m for m in messages_res.messages if m.user_id != skip_user_id]
         messages = await TradeMessage.create_or_update_bulk(
             [{
                 "external_id": message_data.id,
-                "external_user_id": message_data.user.id,
-                "external_user_name": message_data.user.user_name,
+                "external_user_id": message_data.user_id,
                 "body": message_data.body,
                 "date": message_data.date,
-                "attachment_url": message_data.attachment.url,
-                "attachment_content_type": message_data.attachment.content_type,
+                "attachment_url": message_data.attachment.url if message_data.attachment else None,
+                "attachment_content_type": message_data.attachment.content_type if message_data.attachment else None,
                 "trade_id": trade_internal_id,
-            } for message_data in messages_res.messages]
+            } for message_data in messages_data]
         )
         return messages
 

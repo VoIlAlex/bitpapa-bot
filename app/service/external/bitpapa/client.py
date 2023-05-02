@@ -8,7 +8,7 @@ from typing import Union, Optional, List
 import httpx
 
 from service.external.bitpapa.schema import SearchOffersResult, SearchOffer, TradeConversation, \
-    TradeConversationMessage, Trade, ExchangeRate
+    TradeConversationMessage, Trade, ExchangeRate, TradeConversationMessageSent
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +163,6 @@ class BitPapaClient:
                 except Exception:
                     err_info = {}
                 raise RuntimeError("Request error.", res.status_code, err_info)
-
         return TradeConversation(**res.json())
 
     async def create_message_in_trade_conversation(
@@ -175,9 +174,7 @@ class BitPapaClient:
         url = f'{self.api_url}/trades/{trade_id}/create_message_in_trade_conversation'
 
         request_body = {
-            "body": body,
-            "filename": None,
-            "attachment": None
+            "body": body
         }
 
         if file_path:
@@ -195,7 +192,7 @@ class BitPapaClient:
                     "X-Access-Token": self.token,
                     "Content-Type": "application/json"
                 },
-                json=body
+                json=request_body
             )
             if res.status_code != 200:
                 try:
@@ -203,8 +200,7 @@ class BitPapaClient:
                 except Exception:
                     err_info = {}
                 raise RuntimeError("Request error.", res.status_code, err_info)
-
-            return TradeConversationMessage(**res.json())
+            return TradeConversationMessage(**res.json()["message"])
 
     async def get_trade(
         self,

@@ -113,11 +113,7 @@ class TradeBot:
         if not offer.greeting_only and trade.contractor_phone:
             if trade.requisites_sent:
                 if trade.external_status == TradeRemoteStatus.PAID_CONFIRMED.value:
-                    # TODO: remove mock
-                    bill = SimpleNamespace(
-                        status_value="PAID"
-                    )
-                    # bill = await self.syncer.sync_trade_bill(trade=trade)
+                    bill = await self.syncer.sync_trade_bill(trade=trade)
                     if bill.status_value == "PAID":
                         await self.messenger.send_paid_message()
                         if offer.auto_trade_close:
@@ -132,16 +128,11 @@ class TradeBot:
                     else:
                         if trade.status != TradeStatus.PAYMENT_NOT_RECEIVED.value:
                             await self.messenger.send_payment_failed()
-                            # await self.bitpapa_client.cancel_trade(self.trade_id)
                             await trade.update(
                                 status=TradeStatus.PAYMENT_NOT_RECEIVED.value
                             )
             else:
-                # TODO: remove mock
-                bill = SimpleNamespace(
-                    pay_url="http://example.com/"
-                )
-                # bill = await self.generator.generate_bill(offer=offer, trade=trade)
+                bill = await self.generator.generate_bill(offer=offer, trade=trade)
                 await self.messenger.send_bill(bill.pay_url)
                 await trade.update(requisites_sent=True)
 

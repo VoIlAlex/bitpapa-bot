@@ -86,19 +86,19 @@ services:
       - ./app:/app
     entrypoint: ./entrypoints/course_updater.entrypoint.sh
 
-#  trade_handler:
-#    container_name: bitpapa_trade_handler
-#    build:
-#      context: ./app
-#      dockerfile: ../provision/Dockerfile.server
-#    env_file:
-#      - ./.env
-#    depends_on:
-#      - postgres
-#      - config_server
-#    volumes:
-#      - ./app:/app
-#    entrypoint: ./entrypoints/price_updater.entrypoint.sh
+  trade_handler:
+    container_name: bitpapa_trade_handler
+    build:
+      context: ./app
+      dockerfile: ../provision/Dockerfile.server
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - config_server
+    volumes:
+      - ./app:/app
+    entrypoint: ./entrypoints/trade_handler.entrypoint.sh
 
   nginx:
     image: nginx:latest

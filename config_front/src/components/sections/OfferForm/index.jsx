@@ -203,6 +203,26 @@ export default ({offerId, className}) => {
                     search_price_limit_max: e.target.value
                 })
             }/>
+            <label className="offer-form__label" itemID="search_amount_limit_min">Search amount limit min:</label>
+            <input
+                className="offer-form__input"
+                id="search_amount_limit_min"
+                value={offer.search_amount_limit_min}
+                onChange={e => setOffer({
+                    ...offer,
+                    search_amount_limit_min: e.target.value
+                })
+            }/>
+            <label className="offer-form__label" itemID="search_amount_limit_max">Search amount limit max:</label>
+            <input
+                className="offer-form__input"
+                id="search_amount_limit_max"
+                value={offer.search_amount_limit_max}
+                onChange={e => setOffer({
+                    ...offer,
+                    search_amount_limit_max: e.target.value
+                })
+            }/>
             <label className="offer-form__label" itemID="search_minutes_offline_max">Search minutes offline max:</label>
             <input
                 className="offer-form__input"

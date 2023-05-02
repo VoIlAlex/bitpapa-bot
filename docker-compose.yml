@@ -100,6 +100,20 @@ services:
       - ./app:/app
     entrypoint: ./entrypoints/trade_handler.entrypoint.sh
 
+  new_trades_fetcher:
+    container_name: bitpapa_new_trades_fetcher
+    build:
+      context: ./app
+      dockerfile: ../provision/Dockerfile.server
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - config_server
+    volumes:
+      - ./app:/app
+    entrypoint: ./entrypoints/new_trades_fetcher.entrypoint.sh
+
   nginx:
     image: nginx:latest
     container_name: bitpapa_nginx

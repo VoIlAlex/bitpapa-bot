@@ -83,5 +83,11 @@ def start_course_updater():
     TaskUpdateCourse.start_loop()
 
 
+@start_group.command("new_trades_fetcher")
+def new_trades_fetcher():
+    from tasks.fetch_new_trades import TaskFetchNewTrades
+    TaskFetchNewTrades.start_loop()
+
+
 if __name__ == '__main__':
     cli()

@@ -1,16 +1,8 @@
-import re
-from datetime import datetime, timezone, timedelta
 from logging import getLogger
-from types import SimpleNamespace
-from uuid import uuid4
-
-from config import config
 from db.models import Offer
-from db.models.trades import Trade, TradeMessage, TradeQiwiBill, TradeStatus, TradeRemoteStatus
+from db.models.trades import Trade, TradeMessage, TradeStatus, TradeRemoteStatus
 from service.external.bitpapa.client import BitPapaClient
 from service.external.qiwi.client import QiwiClient
-from service.templates_handlers import get_greeting_text, get_bill_text, get_paid_text, \
-    get_wrong_phone_format_text, get_phone_success_text
 from service.trade_bot.generator import TradeBotGenerator
 from service.trade_bot.messenger import TradeBotMessenger
 from service.trade_bot.syncer import TradeBotSyncer

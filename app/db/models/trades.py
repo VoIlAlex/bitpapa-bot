@@ -133,6 +133,32 @@ class Trade(Base):
             await session.commit()
             await session.refresh(self)
 
+    @staticmethod
+    async def exists_by_external_id(external_id: str, session: AsyncSession):
+        query = select(Trade).where(Trade.external_id == external_id)
+        result = await session.execute(query)
+        return result.scalar()
+
+    @staticmethod
+    async def bulk_create_if_not_exist(objs: List["Trade"]):
+        async with AsyncSession() as session:
+            for obj in objs:
+                trade_exists = await Trade.exists_by_external_id(obj.external_id, session)
+                if not trade_exists:
+                    session.add(obj)
+            await session.commit()
+
+    @staticmethod
+    async def get_active_external_ids():
+        async with AsyncSession() as session:
+            query = select(Trade.external_id, Trade.external_ad_id).where(
+                Trade.status != TradeStatus.PAID.value,
+                Trade.status != TradeStatus.COMPLETED.value,
+                Trade.status != TradeStatus.CANCELED.value
+            )
+            result = await session.execute(query)
+            return result.all()
+
 
 class TradeMessage(Base):
     __tablename__ = "trades_messages"
